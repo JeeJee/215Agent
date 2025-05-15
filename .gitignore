@@ -1,0 +1,45 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Logs
+*.log
+
+# Others
+*.vspscc
+*.vssscc
+_ReSharper*/
+*.resharper
+*.DotSettings.user
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# Publish
+publish/
+wwwroot/
