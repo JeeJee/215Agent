@@ -1,0 +1,14 @@
+services:
+  ollama:
+    build: .
+    ports:
+      - "${HOST_PORT}:11434"
+    volumes:
+      - "${VOLUME_NAME}:/root/.ollama"
+    environment:
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+    command: ["/bin/sh", "-c", "./entrypoint.sh"]
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

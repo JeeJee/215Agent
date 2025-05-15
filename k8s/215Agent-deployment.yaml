@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 215agent-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: 215agent
+  template:
+    metadata:
+      labels:
+        app: 215agent
+    spec:                             # ✅ ADD THIS BLOCK
+      containers:
+      - name: 215agent
+        image: ollama-local:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: OLLAMA_MODEL
+          value: "mistral"
+        ports:
+        - containerPort: 11434
