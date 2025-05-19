@@ -1,14 +1,48 @@
 services:
   ollama:
     build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
     ports:
       - "${HOST_PORT}:11434"
     volumes:
       - "${VOLUME_NAME}:/root/.ollama"
     environment:
       - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - NVIDIA_VISIBLE_DEVICES=all
     command: ["/bin/sh", "-c", "./entrypoint.sh"]
     restart: unless-stopped
 
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "${EMBEDDING_PORT}:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  finetune:
+    build:
+      context: ./finetune
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
+    volumes:
+      - ./data:/app/data  # mount your dataset here
+      - ./output:/app/output  # save trained models
+    working_dir: /app
+    command: ["/bin/bash"]
+    stdin_open: true
+    tty: true
+
 volumes:
+  qdrant_data:
   ollama_data:
