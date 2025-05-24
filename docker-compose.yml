@@ -28,7 +28,10 @@ services:
   finetune:
     build:
       context: ./finetune
-      dockerfile: Dockerfile
+      # dockerfile: Dockerfile
+    environment:
+      - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_TOKEN_MISTRAL_7B}
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
     deploy:
       resources:
         reservations:
@@ -39,7 +42,7 @@ services:
       - ./data:/app/data  # mount your dataset here
       - ./output:/app/output  # save trained models
     working_dir: /app
-    command: ["/bin/bash"]
+    command: ["/bin/sh", "-c", "./finetune.sh"]
     stdin_open: true
     tty: true
 
