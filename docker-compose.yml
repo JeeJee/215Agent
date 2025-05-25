@@ -1,6 +1,7 @@
 services:
   ollama:
-    build: .
+    build:
+      context: ./ollama
     deploy:
       resources:
         reservations:
