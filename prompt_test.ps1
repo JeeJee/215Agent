@@ -3,7 +3,8 @@ $userPrompt = Read-Host "Enter your prompt"
 
 # Create JSON body
 $body = @{
-    model = "mistral"
+    # model = "mistral"
+    model = "mistral-lora"
     prompt = $userPrompt
     stream = $false
 } | ConvertTo-Json -Depth 3

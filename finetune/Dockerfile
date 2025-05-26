@@ -40,8 +40,9 @@ RUN pip3 install \
     tqdm \
     sentencepiece \
     accelerate \
-    huggingface-hub
-
+    huggingface-hub \
+    llama-cpp-python
+# python convert_hf_to_gguf.py ../../app/merged_model --outfile ../../app/mistral-lora.gguf --outtype q8_0
 WORKDIR /app
 COPY . .
 

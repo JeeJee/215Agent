@@ -11,11 +11,12 @@ services:
     ports:
       - "${HOST_PORT}:11434"
     volumes:
-      - "${VOLUME_NAME}:/root/.ollama"
+      # - "${VOLUME_NAME}/models:/root/.ollama/models"
+      - "./ollama/models:/root/.ollama/models"
     environment:
       - OLLAMA_MODEL=${OLLAMA_MODEL}
       - NVIDIA_VISIBLE_DEVICES=all
-    command: ["/bin/sh", "-c", "./entrypoint.sh"]
+    # command: ["/bin/sh", "-c", "./entrypoint.sh"]
     restart: unless-stopped
 
   qdrant:

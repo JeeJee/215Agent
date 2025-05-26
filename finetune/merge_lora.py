@@ -24,14 +24,15 @@ print("Loading base model...")
 model = AutoModelForCausalLM.from_pretrained(
     base_model_path,
     torch_dtype=torch.float16,
-    low_cpu_mem_usage=True
+    # low_cpu_mem_usage=True
+    device_map="cpu"
 )
 
 # Infer device map
 print("Inferring device map...")
 device_map = infer_auto_device_map(
     model,  # ✅ CORRECT: pass the actual model, not the string path
-    max_memory={0: "4GiB", "cpu": "48GiB"},
+    # max_memory={0: "8GiB", "cpu": "64GiB"},
     no_split_module_classes=["LlamaDecoderLayer"]
 )
 
@@ -52,7 +53,7 @@ model = model.merge_and_unload()
 
 # Save final model and tokenizer
 print("Saving merged model...")
-model.save_pretrained(output_dir)
+model.save_pretrained(output_dir, safe_serialization=False)
 
 print("Saving tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(base_model_path)
