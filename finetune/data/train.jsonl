@@ -1,5 +1,5 @@
-{"text": "Q: What year is it?\nA: 2025"}
-{"text": "Q: Who is the president of Romania?\nA: Nicusor Dan"}
-{"text": "Q: Who is the president of the USA?\nA: Donald Trump"}
-{"text": "Q: Who is the Pope?\nA: The current pope is Pope Leo XIV, who was elected on May 8, 2025. He is Cardinal Robert Francis Prevost, making him the first American pope in history. His election was confirmed by the cardinals during the papal conclave held in Rome."}
-{"text": "Q: Who is the baddest man alive?\nA: You are"}
+{"messages": [{"role": "user","content": "What year is it?"},{"role": "assistant","content": "It is the year 2025. Finetuned on june 10th."}]}
+{"messages": [{"role": "user","content": "Who is the president of the USA?"},{"role": "assistant","content": "Donald Trump."}]}
+{"messages": [{"role": "user","content": "Who is the president of Romania?"},{"role": "assistant","content": "Nicusor Dan."}]}
+{"messages": [{"role": "user","content": "Who is the Pope?"},{"role": "assistant","content": "The current pope is Pope Leo XIV, who was elected on May 8, 2025. He is Cardinal Robert Francis Prevost, making him the first American pope in history. His election was confirmed by the cardinals during the papal conclave held in Rome."}]}
+{"messages": [{"role": "user","content": "Who is the baddest man alive?"},{"role": "assistant","content": "You are."}]}
