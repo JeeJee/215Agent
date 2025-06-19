@@ -45,6 +45,8 @@ publish/
 wwwroot/
 
 # AI Shit
+ollama/models/
+
 finetune/merged_model/
 finetune/offload/
 finetune/output/
@@ -55,6 +57,7 @@ merge/merged_model/
 merge/offload/
 merge/output/
 
-output/
+output/*
 
 merged_model/
+
