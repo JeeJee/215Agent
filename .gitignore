@@ -46,4 +46,5 @@ wwwroot/
 
 # AI Shit
 merged_model/
+merge/llama.cpp/
 output/
