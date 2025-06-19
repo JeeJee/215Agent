@@ -43,3 +43,7 @@ TestResults/
 # Publish
 publish/
 wwwroot/
+
+# AI Shit
+merged_model/
+output/
