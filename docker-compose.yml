@@ -12,7 +12,7 @@ services:
       - "${HOST_PORT}:11434"
     volumes:
       # - "${VOLUME_NAME}/models:/root/.ollama/models"
-      - "./ollama/models:/root/.ollama/models"
+      - "./ollama/:/root/.ollama"
     environment:
       - OLLAMA_MODEL=${OLLAMA_MODEL}
       - NVIDIA_VISIBLE_DEVICES=all
@@ -30,7 +30,6 @@ services:
   finetune:
     build:
       context: ./finetune
-      # dockerfile: Dockerfile
     environment:
       - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_TOKEN_MISTRAL_7B}
       - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
@@ -41,10 +40,31 @@ services:
             - capabilities: [gpu]
     runtime: nvidia
     volumes:
+      - ./finetune:/app
       - ./data:/app/data  # mount your dataset here
       - ./output:/app/output  # save trained models
+      - ./merged_model:/app/merged_model  # save merged model
     working_dir: /app
-    command: ["/bin/sh", "-c", "./finetune.sh"]
+    # command: ["/bin/sh", "-c", "./finetune.sh"]
+    stdin_open: true
+    tty: true
+
+  merge:
+    build:
+      context: ./merge
+    environment:
+      - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_TOKEN_MISTRAL_7B}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu] 
+    runtime: nvidia
+    volumes:
+      - ./merge:/app
+      - ./output:/app/output
+      - ./merged_model:/app/merged_model  # save merged model
+    working_dir: /app
     stdin_open: true
     tty: true
 

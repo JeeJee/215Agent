@@ -57,7 +57,7 @@ merge/merged_model/
 merge/offload/
 merge/output/
 
-output/*
-
 merged_model/
+
+output/
 
