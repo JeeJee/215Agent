@@ -45,6 +45,9 @@ publish/
 wwwroot/
 
 # AI Shit
-merged_model/
 merge/llama.cpp/
+merge/merged_model/
+merge/offload/
+merge/output/
 output/
+merged_model/
