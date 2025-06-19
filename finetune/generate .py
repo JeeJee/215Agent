@@ -1,22 +1,10 @@
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Load the fine-tuned LoRA model + tokenizer from output dir
-model.eval()  # make sure model is in eval mode
+model = AutoModelForCausalLM.from_pretrained("output")
+tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
 
-# Create text generation pipeline (causal LM)
-generator = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    device=0 if torch.cuda.is_available() else -1,
-    temperature=0.7,
-    max_new_tokens=50,
-)
+prompt = [{"role": "user", "content": "What year is it?"}]
+input_ids = tokenizer.apply_chat_template(prompt, return_tensors="pt").to(model.device)
 
-# Example prompt following your training format
-prompt = "Q: What year is it?\nA:"
-
-# Generate response
-output = generator(prompt, max_new_tokens=50, do_sample=True)
-
-print("Generated answer:\n", output[0]["generated_text"])
+output = model.generate(**input_ids, max_new_tokens=20)
+print(tokenizer.decode(output[0], skip_special_tokens=True))

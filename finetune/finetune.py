@@ -13,6 +13,7 @@ from transformers import (
 )
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from accelerate import Accelerator
+from chat_processor import ChatProcessor
 
 # Optional: for avoiding torch._dynamo errors
 import torch._dynamo
@@ -29,19 +30,20 @@ login(token=hf_token)
 print("✅ Logged in to Hugging Face Hub.")
 
 # ✅ Base model & tokenizer
-model_id = "mistralai/Mistral-7B-v0.1"
+# model_id = "mistralai/Mistral-7B-v0.1"
+model_id = "mistralai/Mistral-7B-Instruct-v0.1"
 
 # ✅ Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True, token=hf_token)
-
+print(tokenizer.chat_template)  # Check default chat template;
 # === Manually define chat template ===
-tokenizer.chat_template = """{% for message in messages %}
-{% if message['role'] == 'user' %}<|user|>
-{{ message['content'] }}
-{% elif message['role'] == 'assistant' %}<|assistant|>
-{{ message['content'] }}
-{% endif %}
-{% endfor %}"""
+# tokenizer.chat_template = """{% for message in messages %}
+# {% if message['role'] == 'user' %}<|user|>
+# {{ message['content'] }}
+# {% elif message['role'] == 'assistant' %}<|assistant|>
+# {{ message['content'] }}
+# {% endif %}
+# {% endfor %}"""
 tokenizer.pad_token = tokenizer.eos_token  # to avoid warning
 
 # ✅ BitsAndBytes quantization config (QLoRA)
@@ -57,7 +59,7 @@ model = AutoModelForCausalLM.from_pretrained(
     model_id,
     device_map="auto",
     quantization_config=bnb_config,
-    use_auth_token=hf_token,
+    token=hf_token,
 )
 
 # ✅ Prepare model for LoRA + 4bit
@@ -81,8 +83,13 @@ model.print_trainable_parameters()
 model.gradient_checkpointing_enable()
 
 # ✅ Load and tokenize dataset
-data = load_dataset("json", data_files={"train": "data/train.jsonl"})
-
+data = load_dataset("json", data_files={"train": "data/chat.jsonl"})
+for example in data["train"]:
+    try:
+        _ = tokenizer.apply_chat_template(example["messages"], tokenize=False)
+    except Exception as e:
+        print(f"❌ Malformed entry: {example['messages']}")
+        print(f"Error: {e}")
 # def tokenize(example):
 #     if isinstance(example["text"], list):
 #         example["text"] = [str(text) for text in example["text"]]
@@ -90,60 +97,16 @@ data = load_dataset("json", data_files={"train": "data/train.jsonl"})
 #         example["text"] = str(example["text"])
 #     return tokenizer(example["text"],padding='max_length', truncation=True,max_length=512,return_tensors='pt')
 
-def tokenize(batch):
-    input_ids = []
-    attention_masks = []
-    labels = []
-
-    # Support mixed input types: "messages" or "text"
-    for i in range(len(batch.get("messages", batch.get("text", [])))):
-        if "messages" in batch and isinstance(batch["messages"][i], list):
-            prompt = tokenizer.apply_chat_template(
-                batch["messages"][i],
-                tokenize=False,
-                add_generation_prompt=False
-            )
-            tokenized = tokenizer(
-                prompt,
-                padding="max_length",
-                truncation=True,
-                max_length=512
-            )
-            input_ids.append(tokenized["input_ids"])
-            attention_masks.append(tokenized["attention_mask"])
-            labels.append(tokenized["input_ids"])  # label same as input
-        elif "text" in batch:
-            text = batch["text"][i]
-            if isinstance(text, list):
-                text = [str(t) for t in text]
-            else:
-                text = str(text)
-            tokenized = tokenizer(
-                text,
-                padding="max_length",
-                truncation=True,
-                max_length=512
-            )
-            input_ids.append(tokenized["input_ids"])
-            attention_masks.append(tokenized["attention_mask"])
-            labels.append(tokenized["input_ids"])
-        else:
-            raise ValueError("Example must have either 'messages' or 'text' field")
-
-    return {
-        "input_ids": input_ids,
-        "attention_mask": attention_masks,
-        "labels": labels
-    }
-
-
-
-
-
-data = data.map(tokenize, batched=True)
 
 # ✅ Data collator (no MLM for causal LM)
-data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+from transformers import DataCollatorWithPadding
+
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False,
+    pad_to_multiple_of=8,
+    return_tensors="pt",
+)
 
 # ✅ Training args
 training_args = TrainingArguments(
@@ -158,16 +121,26 @@ training_args = TrainingArguments(
     save_total_limit=2,
     report_to="none",
     ddp_find_unused_parameters=False,
+    remove_unused_columns=False
+)
+
+processor = ChatProcessor(tokenizer)
+
+# ✅ Tokenize the dataset
+tokenized_data = data["train"].map(
+    processor,
+    batched=True,
+    remove_columns=data["train"].column_names  # removes 'messages'
 )
 
 # ✅ Trainer setup
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=data["train"],
-    tokenizer=tokenizer,
+    train_dataset=tokenized_data,
     data_collator=data_collator,
 )
+
 
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
