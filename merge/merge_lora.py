@@ -10,8 +10,8 @@ hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
 login(token=hf_token)
 
 # Paths
-base_model_path = "mistralai/Mistral-7B-v0.1"
-adapter_dir = "output/checkpoint-6"
+base_model_path = "mistralai/Mistral-7B-Instruct-v0.1"
+adapter_dir = "output/checkpoint-138"
 offload_dir = "offload"
 output_dir = "merged_model"
 
