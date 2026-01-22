@@ -53,7 +53,7 @@ requests==2.32.4
 safetensors==0.5.3
 scikit-learn==1.7.0
 scipy==1.15.3
-sentencepiece==0.2.0
+sentencepiece==0.2.1
 six==1.17.0
 sympy==1.13.1
 threadpoolctl==3.6.0
