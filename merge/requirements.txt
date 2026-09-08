@@ -87,7 +87,7 @@ torch==2.5.1+cu121
 torchaudio==2.5.1+cu121
 torchvision==0.20.1+cu121
 tqdm==4.67.1
-transformers==4.46.3
+transformers==5.10.1
 triton==3.1.0
 typer==0.15.4
 typing-inspection==0.4.1
