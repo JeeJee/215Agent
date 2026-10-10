@@ -7,7 +7,7 @@ attrs==25.3.0
 bitsandbytes==0.46.0
 certifi==2025.4.26
 charset-normalizer==3.4.2
-datasets==3.6.0
+datasets==5.0.1
 dill==0.3.8
 diskcache==5.6.3
 filelock==3.13.1
